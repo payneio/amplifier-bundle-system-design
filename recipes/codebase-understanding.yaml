@@ -1,0 +1,149 @@
+name: "codebase-understanding"
+description: "Survey codebase structure, identify boundaries and coupling, map flows, and produce an architectural overview"
+version: "1.0.0"
+author: "System Design Intelligence"
+tags: ["codebase", "understanding", "architecture", "survey", "system-design"]
+
+# Flat sequential recipe for building architectural understanding of a codebase.
+#
+# Steps:
+# 1. Survey directory structure, file types, entry points, docs
+# 2. Identify module boundaries, coupling patterns, dependency relationships
+# 3. Map data flows, control flows, assess complexity distribution
+# 4. Produce final architectural overview
+#
+# Typical runtime: 5-10 minutes
+# Required agents: foundation:explorer, system-design-intelligence:systems-architect
+#
+# Usage:
+#   Execute recipe with target_path=<path-to-codebase>
+
+context:
+  target_path: ""    # Required: path to codebase to understand
+  focus_area: ""     # Optional: specific subsystem or directory to focus on
+
+steps:
+  # Step 1: Survey the codebase structure
+  - id: "survey-structure"
+    agent: "foundation:explorer"
+    prompt: |
+      Survey the codebase at {{target_path}}.
+
+      Focus area: {{focus_area}} (if empty, survey the entire codebase)
+
+      Produce a comprehensive inventory:
+      1. **Directory layout**: Top-level structure and what each directory contains
+      2. **File types**: Languages, config formats, and their distribution
+      3. **Entry points**: Main files, CLI entry points, API routers, event handlers, workers
+      4. **Configuration**: Config files, environment setup, feature flags
+      5. **Dependencies**: Package manifests, lock files, vendored code
+      6. **Documentation**: README files, docs directories, inline doc patterns
+      7. **Tests**: Test directory structure, test frameworks in use, approximate coverage
+      8. **Build/Deploy**: CI/CD configs, Dockerfiles, deployment scripts
+      9. **Notable files**: Anything unusual or worth calling out
+
+      Be thorough and factual. Report what exists, not what should exist.
+    output: "structure_survey"
+    timeout: 600
+
+  # Step 2: Identify boundaries and coupling
+  - id: "identify-boundaries"
+    agent: "system-design-intelligence:systems-architect"
+    mode: "ANALYZE"
+    prompt: |
+      Analyze the codebase at {{target_path}} to identify architectural boundaries and coupling.
+
+      Structure survey: {{structure_survey}}
+      Focus area: {{focus_area}} (if empty, analyze the entire codebase)
+
+      Identify:
+      1. **Module boundaries**: Where are the logical separations? Are they enforced or conventional?
+      2. **Coupling patterns**: What depends on what? Where is coupling tight vs. loose?
+         Use file imports, shared types, and cross-module references as evidence.
+      3. **Dependency relationships**: Internal module dependencies (which modules call which).
+         External dependency hotspots (which modules rely heavily on external libraries).
+      4. **Interface patterns**: How do modules communicate? (function calls, events, shared state, APIs)
+      5. **Boundary violations**: Where do modules reach into each other's internals?
+
+      Present as a structured analysis with specific file/directory references as evidence.
+      Rate overall boundary health: clean / mostly clean / leaky / entangled.
+    output: "boundary_analysis"
+    timeout: 600
+
+  # Step 3: Map flows and assess complexity
+  - id: "map-flows"
+    agent: "system-design-intelligence:systems-architect"
+    mode: "ASSESS"
+    prompt: |
+      Map data and control flows in the codebase at {{target_path}}.
+
+      Structure survey: {{structure_survey}}
+      Boundary analysis: {{boundary_analysis}}
+      Focus area: {{focus_area}} (if empty, map the entire codebase)
+
+      Analyze:
+      1. **Data flows**: How does data enter the system? How does it move between components?
+         Where is it stored? Where does it exit? Identify the primary data paths.
+      2. **Control flows**: What triggers processing? How do requests flow through the system?
+         What orchestrates multi-step operations?
+      3. **Complexity distribution**: Where is complexity concentrated? Which modules/files
+         carry the most logic? Where are the complexity hotspots?
+      4. **Architectural patterns in use**: What patterns does the codebase actually use?
+         (MVC, event-driven, layered, hexagonal, etc.) Are patterns consistent or mixed?
+      5. **State management**: Where is state held? How is it synchronized?
+         Where are the consistency boundaries?
+
+      Be specific -- reference actual files, functions, and paths.
+    output: "flow_analysis"
+    timeout: 600
+
+  # Step 4: Produce the architectural overview
+  - id: "architectural-overview"
+    agent: "system-design-intelligence:systems-architect"
+    mode: "ASSESS"
+    prompt: |
+      Produce a final architectural overview for the codebase at {{target_path}}.
+
+      Synthesize ALL previous analysis:
+      - Structure survey: {{structure_survey}}
+      - Boundary analysis: {{boundary_analysis}}
+      - Flow analysis: {{flow_analysis}}
+      Focus area: {{focus_area}} (if empty, cover the entire codebase)
+
+      Write a comprehensive architectural overview:
+
+      ## System Architecture: [Name]
+
+      ### Components
+      (List each major component, its responsibility, and its boundaries)
+
+      ### Boundaries and Interfaces
+      (How components connect, communication patterns, boundary health)
+
+      ### Data Flows
+      (Primary data paths through the system, storage points, transformation points)
+
+      ### Control Flows
+      (Request processing, event handling, orchestration patterns)
+
+      ### Architectural Patterns
+      (Patterns in use, consistency assessment, pattern fitness)
+
+      ### Coupling Assessment
+      (Overall coupling level, tight coupling hotspots, loose coupling examples)
+
+      ### Complexity Hotspots
+      (Where complexity concentrates, why, and whether it's warranted)
+
+      ### Architectural Debt
+      (Pattern violations, workarounds, boundary erosion, inconsistencies)
+
+      ### Strengths
+      (What the architecture does well)
+
+      ### Recommendations
+      (Ordered by impact -- what would improve the architecture most)
+
+      Ground every observation in specific evidence from the codebase.
+    output: "architectural_overview"
+    timeout: 600

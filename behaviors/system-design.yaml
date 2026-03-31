@@ -4,9 +4,33 @@ bundle:
   description: |
     System design methodology behavior.
     Loads design principles, structured output template, and standing orders
-    into the root session context.
+    into the root session context. Provides /design and /design-review modes.
 
+# Explicit dependency on the modes behavior for namespace resolution
+# (modes:context/modes-instructions.md needs the "modes" namespace registered)
+# NOTE: Include the behavior, NOT the full bundle — the full bundle transitively
+# includes foundation, which overrides session.orchestrator to loop-streaming.
+includes:
+  - bundle: git+https://github.com/microsoft/amplifier-bundle-modes@main#subdirectory=behaviors/modes.yaml
+
+# Mode hook to discover system-design modes (design, design-review)
+# TODO: When published to git, replace absolute path with:
+#   "@system-design-intelligence:modes"
+# or a git+https:// URL. The @namespace syntax does not resolve at mount time.
+hooks:
+  - module: hooks-mode
+    source: git+https://github.com/microsoft/amplifier-bundle-modes@main#subdirectory=modules/hooks-mode
+    config:
+      search_paths:
+        - "/data/labs/amplifier-system-design/modes"
+
+# Mode tool for programmatic mode transitions (agents can request mode changes)
+# Skills tool for discoverable design knowledge
 tools:
+  - module: tool-mode
+    source: git+https://github.com/microsoft/amplifier-bundle-modes@main#subdirectory=modules/tool-mode
+    config:
+      gate_policy: "warn"
   - module: tool-skills
     source: git+https://github.com/microsoft/amplifier-module-tool-skills@main
     config:

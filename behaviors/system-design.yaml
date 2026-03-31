@@ -11,7 +11,7 @@ tools:
     source: git+https://github.com/microsoft/amplifier-module-tool-skills@main
     config:
       skills:
-        - "@system-design-intelligence:skills"
+        - "/data/labs/amplifier-system-design/skills"
 
 context:
   include:

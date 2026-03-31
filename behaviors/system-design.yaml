@@ -6,6 +6,13 @@ bundle:
     Loads design principles, structured output template, and standing orders
     into the root session context.
 
+tools:
+  - module: tool-skills
+    source: git+https://github.com/microsoft/amplifier-module-tool-skills@main
+    config:
+      skills:
+        - "@system-design-intelligence:skills"
+
 context:
   include:
     - system-design-intelligence:context/system-design-principles.md

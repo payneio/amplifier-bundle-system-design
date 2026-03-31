@@ -1,0 +1,13 @@
+bundle:
+  name: system-design-behavior
+  version: 0.1.0
+  description: |
+    System design methodology behavior.
+    Loads design principles, structured output template, and standing orders
+    into the root session context.
+
+context:
+  include:
+    - system-design-intelligence:context/system-design-principles.md
+    - system-design-intelligence:context/structured-design-template.md
+    - system-design-intelligence:context/instructions.md

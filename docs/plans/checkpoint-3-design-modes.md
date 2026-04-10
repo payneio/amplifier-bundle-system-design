@@ -2,9 +2,9 @@
 
 > **Execution:** Use the subagent-driven-development workflow to implement this plan.
 
-**Goal:** Add two interactive modes (`/design` and `/design-review`) to the systems-design bundle, giving users a structured 8-phase design workflow that blocks writes and enforces rigorous systems thinking before artifact creation.
+**Goal:** Add two interactive modes (`/design` and `/systems-design-review`) to the systems-design bundle, giving users a structured 8-phase design workflow that blocks writes and enforces rigorous systems thinking before artifact creation.
 
-**Architecture:** Two markdown mode files with YAML frontmatter define tool policies and inject process guidance into the agent's system prompt. The modes infrastructure (hooks-mode for enforcement + tool-mode for programmatic transitions) is wired into the existing behavior YAML. The `/design` mode follows the superpowers hybrid pattern: conversation happens in-mode, artifact creation is delegated to an agent. `/design-review` is a lighter read-only evaluation mode.
+**Architecture:** Two markdown mode files with YAML frontmatter define tool policies and inject process guidance into the agent's system prompt. The modes infrastructure (hooks-mode for enforcement + tool-mode for programmatic transitions) is wired into the existing behavior YAML. The `/design` mode follows the superpowers hybrid pattern: conversation happens in-mode, artifact creation is delegated to an agent. `/systems-design-review` is a lighter read-only evaluation mode.
 
 **Tech Stack:** Amplifier modes system (markdown + YAML frontmatter), hooks-mode module, tool-mode module, existing behavior YAML composition.
 
@@ -30,7 +30,7 @@ bundle:
   description: |
     System design methodology behavior.
     Loads design principles, structured output template, and standing orders
-    into the root session context. Provides /design and /design-review modes.
+    into the root session context. Provides /design and /systems-design-review modes.
 
 # Explicit dependency on the modes behavior for namespace resolution
 # (modes:context/modes-instructions.md needs the "modes" namespace registered)
@@ -287,7 +287,7 @@ When the architect agent has saved the document:
 ```
 Design saved to `docs/plans/YYYY-MM-DD-<topic>-design.md`.
 
-Ready to evaluate this design? Use /design-review.
+Ready to evaluate this design? Use /systems-design-review.
 Ready to create an implementation plan? Use /write-plan.
 ```
 
@@ -351,14 +351,14 @@ When entering this mode, announce:
 
 **Done when:** Design document saved to `docs/plans/`
 
-**Golden path:** `/design-review` or `/write-plan`
-- Tell user: "Design complete and saved to [path]. Use `/design-review` for a multi-perspective evaluation, or `/write-plan` to create an implementation plan."
+**Golden path:** `/systems-design-review` or `/write-plan`
+- Tell user: "Design complete and saved to [path]. Use `/systems-design-review` for a multi-perspective evaluation, or `/write-plan` to create an implementation plan."
 - Use `mode(operation='set', name='design-review')` or `mode(operation='set', name='write-plan')` to transition. The first call will be denied (gate policy); call again to confirm.
 
 **Dynamic transitions:**
 - If the design needs brainstorming on a sub-problem -> use `mode(operation='set', name='brainstorm')` for free-form exploration, then return to /design
 - If bug mentioned -> use `mode(operation='set', name='debug')` because systematic debugging has its own process
-- If user already has a validated design -> suggest `/design-review` for evaluation or `/write-plan` to skip directly to implementation planning
+- If user already has a validated design -> suggest `/systems-design-review` for evaluation or `/write-plan` to skip directly to implementation planning
 
 **Skill connection:** Skills loaded during the process (tradeoff-analysis, adversarial-review, system-type-*) tell you WHAT to analyze. This mode enforces HOW. They complement each other.
 ```
@@ -405,14 +405,14 @@ git add modes/design.md && git commit -m "feat: /design mode — 8-phase structu
 
 ---
 
-### Task 3: Create the /design-review mode
+### Task 3: Create the /systems-design-review mode
 
 **Files:**
-- Create: `modes/design-review.md`
+- Create: `modes/systems-design-review.md`
 
-**Step 1: Create `modes/design-review.md`**
+**Step 1: Create `modes/systems-design-review.md`**
 
-Write the following content to `modes/design-review.md`:
+Write the following content to `modes/systems-design-review.md`:
 
 ```markdown
 ---
@@ -532,7 +532,7 @@ Run:
 ```bash
 python3 -c "
 import yaml
-content = open('modes/design-review.md').read()
+content = open('modes/systems-design-review.md').read()
 parts = content.split('---', 2)
 fm = yaml.safe_load(parts[1])
 print(f'Mode name: {fm[\"mode\"][\"name\"]}')
@@ -556,14 +556,14 @@ VALID
 
 **Step 3: Verify line count**
 
-Run: `wc -l modes/design-review.md`
+Run: `wc -l modes/systems-design-review.md`
 
 Expected: approximately 100-120 lines
 
 **Step 4: Commit**
 
 ```bash
-git add modes/design-review.md && git commit -m "feat: /design-review mode — multi-perspective design evaluation"
+git add modes/systems-design-review.md && git commit -m "feat: /systems-design-review mode — multi-perspective design evaluation"
 ```
 
 ---
@@ -678,7 +678,7 @@ Run:
 python3 -c "
 import yaml
 
-for mode_file in ['modes/design.md', 'modes/design-review.md']:
+for mode_file in ['modes/design.md', 'modes/systems-design-review.md']:
     with open(mode_file) as f:
         content = f.read()
     parts = content.split('---', 2)
@@ -749,7 +749,7 @@ Expected output should show:
 - `./behaviors/system-design.yaml` (modified)
 - `./bundle.md` (unchanged)
 - `./context/instructions.md`, `./context/structured-design-template.md`, `./context/system-design-principles.md` (unchanged)
-- `./modes/design-review.md` (new)
+- `./modes/systems-design-review.md` (new)
 - `./modes/design.md` (new)
 - `./skills/*/SKILL.md` files (unchanged from Checkpoint 2)
 - 3 new commits for Checkpoint 3

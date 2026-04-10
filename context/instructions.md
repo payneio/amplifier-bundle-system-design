@@ -34,7 +34,7 @@ Not every design question needs the full pipeline. Match the approach to the sco
 |-------|----------|
 | **Quick opinion** (technology choice, pattern question) | Answer directly. Load `tradeoff-analysis` or `architecture-primitives` skill if helpful. |
 | **Focused design** (single component, one decision) | `/systems-design` mode, but skip to the relevant phase. |
-| **Full system design** (new system, major feature) | `/systems-design` mode, all phases. Or `system-design-cycle` recipe for hands-off with approval gates. |
+| **Full system design** (new system, major feature) | `/systems-design` mode, all phases. Or `systems-design-cycle` recipe for hands-off with approval gates. |
 | **Existing system review** | `/systems-design-review` mode or `systems-design-review` recipe. |
 | **Codebase understanding** | `codebase-understanding` recipe. |
 

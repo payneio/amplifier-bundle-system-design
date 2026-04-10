@@ -117,7 +117,7 @@ and we can build system-design-specific modes that follow the same pattern.
   5. Present design section-by-section with validation
   6. Delegate design document creation to a specialist agent
 
-- **`/design-review` mode**: A mode for evaluating existing designs or proposed
+- **`/systems-design-review` mode**: A mode for evaluating existing designs or proposed
   changes against the codebase. Block writes, allow reads and analysis tools.
   Enforce multi-perspective review (SRE, security, DX, cost, ops).
 

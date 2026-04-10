@@ -31,7 +31,7 @@ Work is organized into checkpoints. Each ships something usable.
 **Mode** following the superpowers hybrid pattern (conversation in mode, artifacts via agent delegation):
 
 - `modes/design.md` -- Blocks write tools. Safe: read_file, glob, grep, web tools, delegate, load_skill, LSP. Phased process: (1) understand context, (2) model the system, (3) ask questions one at a time, (4) explore 3+ alternatives with tradeoffs, (5) evaluate against fixed frame, (6) present section-by-section with user validation, (7) adversarial review, (8) delegate artifact creation. Anti-rationalization table for design shortcuts. Transitions to: design-review, brainstorm, write-plan.
-- `modes/design-review.md` -- Read-only evaluation mode. Multi-perspective review checklist: design integrity, constraint satisfaction, failure modes, DX, implementation viability, simplicity.
+- `modes/systems-design-review.md` -- Read-only evaluation mode. Multi-perspective review checklist: design integrity, constraint satisfaction, failure modes, DX, implementation viability, simplicity.
 
 **Test**: /design blocks writes, enforces phased process, questions come one at a time, alternatives are generated, anti-rationalization prevents skipping steps.
 

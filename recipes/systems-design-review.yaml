@@ -13,7 +13,7 @@ tags: ["architecture", "review", "system-design", "staged", "approval-gates"]
 #
 # Typical runtime: 10-20 minutes (includes approval wait times)
 # Required agents: foundation:explorer, systems-design:systems-architect,
-#                  systems-design:systems-design-critic, systems-design:system-design-writer
+#                  systems-design:systems-design-critic, systems-design:systems-design-writer
 #
 # Usage:
 #   Execute recipe with target_path=<path-to-codebase>
@@ -58,7 +58,6 @@ stages:
 
       - id: "identify-boundaries"
         agent: "systems-design:systems-architect"
-        mode: "ANALYZE"
         prompt: |
           Based on this codebase survey: {{codebase_survey}}
 
@@ -96,7 +95,6 @@ stages:
     steps:
       - id: "perspective-analysis"
         agent: "systems-design:systems-architect"
-        mode: "ASSESS"
         prompt: |
           Analyze the architecture from a **{{perspective}}** perspective.
 

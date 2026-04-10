@@ -859,7 +859,7 @@ Expected file listing should include:
 ./context/instructions.md
 ./context/structured-design-template.md
 ./context/system-design-principles.md
-./modes/design-review.md
+./modes/systems-design-review.md
 ./modes/design.md
 ./skills/adversarial-review/SKILL.md
 ./skills/architecture-primitives/SKILL.md

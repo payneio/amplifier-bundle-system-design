@@ -49,7 +49,6 @@ steps:
   # Step 2: Identify boundaries and coupling
   - id: "identify-boundaries"
     agent: "systems-design:systems-architect"
-    mode: "ANALYZE"
     prompt: |
       Analyze the codebase at {{target_path}} to identify architectural boundaries and coupling.
 
@@ -73,7 +72,6 @@ steps:
   # Step 3: Map flows and assess complexity
   - id: "map-flows"
     agent: "systems-design:systems-architect"
-    mode: "ASSESS"
     prompt: |
       Map data and control flows in the codebase at {{target_path}}.
 
@@ -100,7 +98,6 @@ steps:
   # Step 4: Produce the architectural overview
   - id: "architectural-overview"
     agent: "systems-design:systems-architect"
-    mode: "ASSESS"
     prompt: |
       Produce a final architectural overview for the codebase at {{target_path}}.
 

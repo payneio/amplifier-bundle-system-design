@@ -60,7 +60,6 @@ stages:
     steps:
       - id: "build-system-map"
         agent: "systems-design:systems-architect"
-        mode: "ANALYZE"
         timeout: 600
         output: "system_map"
         prompt: |
@@ -88,7 +87,6 @@ stages:
 
       - id: "extract-constraints"
         agent: "systems-design:systems-architect"
-        mode: "ANALYZE"
         timeout: 600
         output: "constraints_analysis"
         prompt: |
@@ -142,7 +140,6 @@ stages:
     steps:
       - id: "generate-candidates"
         agent: "systems-design:systems-architect"
-        mode: "DESIGN"
         timeout: 600
         foreach: "{{archetypes}}"
         as: "archetype"
@@ -181,7 +178,6 @@ stages:
 
       - id: "evaluate-tradeoffs"
         agent: "systems-design:systems-architect"
-        mode: "ASSESS"
         timeout: 600
         output: "tradeoff_evaluation"
         prompt: |
@@ -277,7 +273,6 @@ stages:
 
       - id: "refine-design"
         agent: "systems-design:systems-architect"
-        mode: "DESIGN"
         timeout: 600
         output: "refined_design"
         prompt: |

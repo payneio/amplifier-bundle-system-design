@@ -696,7 +696,7 @@ Expected output should include all files from checkpoints 1-5:
 ./docs/plans/checkpoint-4-design-agents.md
 ./docs/plans/checkpoint-5-design-recipes.md
 ./docs/planning/plan.v2.md
-./modes/design-review.md
+./modes/systems-design-review.md
 ./modes/design.md
 ./recipes/architecture-review.yaml
 ./recipes/codebase-understanding.yaml

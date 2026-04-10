@@ -36,10 +36,10 @@ If reviewing an existing system or a design that modifies one:
 
 Delegate the deep adversarial review rather than doing it inline:
 
-**Option A -- Delegate to the system-design-critic agent:**
+**Option A -- Delegate to the systems-design-critic agent:**
 ```
 delegate(
-  agent="systems-design:system-design-critic",
+  agent="systems-design:systems-design-critic",
   instruction="Review this design: [design content or file path]. System context: [relevant codebase findings from Step 2]",
   context_depth="recent",
   context_scope="agents"

@@ -261,7 +261,7 @@ structured interactive workflow for system design exploration.
   - "The requirements aren't clear enough" -- Design reveals requirements.
   - "Let me just start coding" -- write_file is blocked. Design first.
 
-- **`modes/design-review.md`**
+- **`modes/systems-design-review.md`**
   A mode for evaluating existing designs or proposed changes:
   - Read-only + delegate
   - Enforce multi-perspective review

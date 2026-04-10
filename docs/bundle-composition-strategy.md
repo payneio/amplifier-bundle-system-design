@@ -111,7 +111,7 @@ includes:
 **From our bundle (our additions):**
 - Our own context files (system design principles, structured templates)
 - Our own agents (systems architect, design critic, constraint analyst)
-- Our own modes (/design, /design-review)
+- Our own modes (/design, /systems-design-review)
 - Our own skills (system types, tradeoff analysis, architecture primitives)
 - Our own recipes (architecture review, design exploration)
 - Our instruction (replaces foundation's instruction via composition)

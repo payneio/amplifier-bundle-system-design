@@ -33,7 +33,6 @@ steps:
   # Step 1: Frame the problem
   - id: "frame-problem"
     agent: "systems-design:systems-architect"
-    mode: "ANALYZE"
     prompt: |
       Frame this design problem for systematic exploration:
 
@@ -57,7 +56,6 @@ steps:
   # Step 2: Generate 3 candidate architectures in parallel
   - id: "generate-candidates"
     agent: "systems-design:systems-architect"
-    mode: "DESIGN"
     prompt: |
       Design a **{{archetype}}** architecture for this problem:
 
@@ -96,7 +94,6 @@ steps:
   # Step 3: Evaluate all candidates against the 8-dimension tradeoff frame
   - id: "evaluate-tradeoffs"
     agent: "systems-design:systems-architect"
-    mode: "ASSESS"
     prompt: |
       Evaluate these 3 candidate architectures against the 8-dimension tradeoff frame:
 

@@ -107,7 +107,7 @@ digraph "systems-design" {
     ]
     "mode-review" [
       shape=octagon fillcolor="#F0A0A0"
-      label=<<B>/design-review</B><BR/><FONT POINT-SIZE="9">6-step evaluation ~990t</FONT>>
+      label=<<B>/systems-design-review</B><BR/><FONT POINT-SIZE="9">6-step evaluation ~990t</FONT>>
     ]
   }
 
@@ -249,12 +249,12 @@ digraph "systems-design" {
   "mode-design" -> "skill-web" [style=dashed color="#20B2AA" label="suggests"]
   "mode-design" -> "skill-events" [style=dashed color="#20B2AA" label="suggests"]
 
-  // /design-review mode delegates to agents
+  // /systems-design-review mode delegates to agents
   "mode-review" -> "agent-critic" [
     style=bold color="#E07070" label="delegates\n(Step 3: analysis)"
   ]
 
-  // /design-review mode suggests skills
+  // /systems-design-review mode suggests skills
   "mode-review" -> "skill-adversarial" [style=dashed color="#20B2AA" label="suggests"]
   "mode-review" -> "skill-tradeoff" [style=dashed color="#20B2AA" label="suggests"]
 

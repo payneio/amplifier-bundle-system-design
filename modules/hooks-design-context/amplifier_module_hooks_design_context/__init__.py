@@ -2,7 +2,7 @@
 
 Injects ambient design state into the agent's context before every LLM call:
 - Existing design documents in the project (docs/designs/*.md)
-- Current design phase (if /design or /design-review mode is active)
+- Current design phase (if /systems-design or /systems-design-review mode is active)
 - Quick reference to available design mechanisms
 
 Fires on: provider:request (ephemeral, not stored in history)
@@ -57,7 +57,7 @@ async def mount(coordinator: Any, config: dict[str, Any] | None = None) -> None:
             # --- Section 2: Active design mode (if any) ---
             session_state = getattr(coordinator, "session_state", {}) or {}
             active_mode = session_state.get("active_mode")
-            if active_mode and active_mode in ("system-design", "design-review"):
+            if active_mode and active_mode in ("systems-design", "systems-design-review"):
                 sections.append(f"Active design mode: /{active_mode}")
 
             # Assemble the injection

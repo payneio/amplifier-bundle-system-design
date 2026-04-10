@@ -1,1 +1,6 @@
 related-projects/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+sandbox/

@@ -4,42 +4,67 @@
 
 ## Detect Design Requests
 
-When the user asks about system design, architecture, technology selection, service boundaries, data modeling, scaling strategy, or any question where the answer is "it depends on tradeoffs" -- you are in design territory.
+When the user asks about system design, architecture, technology selection, or system evaluation, suggest the appropriate mode or mechanism:
 
-When you detect a design request, suggest entering `/design` mode for a structured process. If `/design` mode is not available, follow the structured design template directly.
+| User Intent | Suggest |
+|-------------|---------|
+| "Design a system for..." / "How should we architect..." | `/system-design` mode |
+| "Review this architecture..." / "Evaluate our system..." | `/design-review` mode |
+| "Compare X vs Y for our use case..." | `/system-design` mode (Phase 4: tradeoff analysis) |
+| Quick design question (< 5 min) | Answer directly, no mode needed |
+| "Run an architecture review of this codebase" | `architecture-review` recipe |
+| "Help me understand this codebase" | `codebase-understanding` recipe |
 
-## Generate Alternatives
+## Mode Entry
 
-For any nontrivial design problem, generate at least **3 candidate architectures**:
+When activating a mode, load its companion skill immediately:
 
-1. **Simplest viable** -- the minimum design that meets core requirements
-2. **Most scalable** -- optimized for growth in usage, data, or team size
-3. **Most robust** -- optimized for reliability, failure tolerance, and operational simplicity
+| Mode | Companion Skill |
+|------|----------------|
+| `/system-design` | `system-design-methodology` |
+| `/design-review` | `design-review-methodology` |
 
-Then **recommend one with explicit reasoning**. Good architects explore the design space before converging.
-
-When filling in the structured design template, Section 8 (Recommended Design) captures your recommendation and Section 9 (Simplest Credible Alternative) captures the simplest option. The alternatives exploration informs these sections but does not need to be reproduced verbatim -- the reasoning for your choice is what matters.
-
-## Always Answer the Catalytic Question
-
-For every design you produce or evaluate, answer:
-
-> **"What does this design optimize for, and what does it sacrifice?"**
-
-If you cannot answer this clearly, the design is not yet understood.
+The mode gates tools. The companion skill governs behavior.
 
 ## Methodology Calibration
 
-Not every task needs full design treatment. Match depth to complexity:
+Not every design question needs the full pipeline. Match the approach to the scope:
 
-| Task | Approach |
-|------|----------|
-| Architecture, new system, major refactor | Full structured design template |
-| Technology selection, integration decision | Tradeoff analysis with alternatives |
-| Small feature within existing architecture | Quick assessment: does it fit? What breaks? |
-| Implementation question | Answer directly -- this is not a design problem |
-| Clarification or explanation | Answer directly |
+| Scope | Approach |
+|-------|----------|
+| **Quick opinion** (technology choice, pattern question) | Answer directly. Load `tradeoff-analysis` or `architecture-primitives` skill if helpful. |
+| **Focused design** (single component, one decision) | `/system-design` mode, but skip to the relevant phase. |
+| **Full system design** (new system, major feature) | `/system-design` mode, all phases. Or `system-design-cycle` recipe for hands-off with approval gates. |
+| **Existing system review** | `/design-review` mode or `architecture-review` recipe. |
+| **Codebase understanding** | `codebase-understanding` recipe. |
 
-Don't produce a 10-section design document for a question that needs a paragraph. But don't give a paragraph when the question deserves structured analysis.
+## Available Mechanisms
+
+**Modes:**
+- `/system-design` -- structured design exploration with section-by-section user validation
+- `/design-review` -- evaluate existing designs against codebase reality
+
+**Recipes:**
+- `system-design-cycle` -- full design pipeline with approval gates (problem framing, candidates, risk, refinement, documentation)
+- `architecture-review` -- staged multi-perspective review with approval gates
+- `design-exploration` -- parallel 3-archetype generation with tradeoff evaluation
+- `codebase-understanding` -- survey, boundaries, flows, architectural overview
+- `bundle-behavioral-spec` -- generate behavioral specification for an Amplifier bundle
+
+**Skills (methodology):**
+- `system-design-methodology` -- companion skill for `/system-design` mode (8 phases)
+- `design-review-methodology` -- companion skill for `/design-review` mode (6 steps)
+
+**Skills (domain):**
+- `adversarial-review` -- parallel 5-perspective stress test (fork skill)
+- `tradeoff-analysis` -- 8-dimension comparison frame and methodology
+- `architecture-primitives` -- catalog of patterns with when-right and when-wrong
+- `system-type-web-service` -- domain patterns for web services
+- `system-type-event-driven` -- domain patterns for event-driven systems
+
+**Agents:**
+- `systems-architect` -- system-level design (ANALYZE, DESIGN, ASSESS modes)
+- `design-critic` -- adversarial review from 5 perspectives (for recipe/delegation use)
+- `design-writer` -- writes validated designs to documents
 
 </STANDING-ORDER>

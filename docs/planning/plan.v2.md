@@ -26,7 +26,7 @@ Work is organized into checkpoints. Each ships something usable.
 
 **Test**: Skills appear in visibility hook. Agent loads them during design conversations. Adversarial review produces genuinely distinct perspectives.
 
-## Checkpoint 3: Structured design workflow via /design mode
+## Checkpoint 3: Structured design workflow via /system-design mode
 
 **Mode** following the superpowers hybrid pattern (conversation in mode, artifacts via agent delegation):
 

@@ -23,6 +23,13 @@ hooks:
     config:
       search_paths:
         - "/data/labs/amplifier-system-design/modes"
+  # Design-context awareness: injects existing design docs and active design
+  # phase into agent context before every LLM call.
+  - module: hooks-design-context
+    source: ./modules/hooks-design-context
+    config:
+      design_docs_glob: "docs/designs/*.md"
+      priority: 5
 
 # Mode tool for programmatic mode transitions (agents can request mode changes)
 # Skills tool for discoverable design knowledge
@@ -45,6 +52,8 @@ agents:
 
 context:
   include:
-    - system-design-intelligence:context/system-design-principles.md
-    - system-design-intelligence:context/structured-design-template.md
     - system-design-intelligence:context/instructions.md
+    - system-design-intelligence:context/system-design-principles.md
+    - system-design-intelligence:context/tradeoff-frame.md
+    - system-design-intelligence:context/adversarial-perspectives.md
+    - system-design-intelligence:context/structured-design-template.md

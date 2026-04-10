@@ -2,7 +2,7 @@
 meta:
   name: design-writer
   description: |
-    Use after a design has been validated through /design mode conversation to write the formal design document. Receives the complete validated design via delegation instruction and structures it into a clean markdown document. Does NOT make design decisions — all decisions were made during the design conversation.
+    Use after a design has been validated through /design mode conversation to write the formal design document. Receives the complete validated design via delegation instruction and structures it into a clean markdown document. Does NOT make design decisions -- all decisions were made during the design conversation.
 
     Examples:
     <example>
@@ -40,43 +40,6 @@ You receive a complete, user-validated design in your delegation instruction. Yo
 3. Commit the file
 
 You do NOT conduct conversations, ask questions, or explore approaches. The orchestrating agent already handled that with the user.
-
-## Design Document Template
-
-Structure every document using these sections. Not every section needs equal depth — calibrate to the problem's complexity. But do not skip sections without stating why.
-
-### 1. Problem Framing
-What is actually being asked? Restate the problem in terms of goals, constraints, and scope.
-
-### 2. Explicit Assumptions
-What is assumed about requirements, scale, team, timeline, existing systems, or constraints?
-
-### 3. System Boundaries
-What is inside the system? What is outside? Where are the interfaces?
-
-### 4. Components and Responsibilities
-What are the major components? What does each one own? What is the source of truth for each piece of state?
-
-### 5. Data and Control Flows
-How does data move through the system? What triggers actions? What are the critical paths?
-
-### 6. Risks and Failure Modes
-What breaks? What happens when it breaks? What is the blast radius? What is the recovery path?
-
-### 7. Tradeoffs
-What does this design optimize for? What does it sacrifice?
-
-### 8. Recommended Design
-The design recommended, with reasoning for why this option over the alternatives.
-
-### 9. Simplest Credible Alternative
-The simplest design that could plausibly work. If far from the recommended design, explain why additional complexity is justified.
-
-### 10. Migration and Rollout Plan
-How to get from here to there. What can be done incrementally? What is the rollback plan?
-
-### 11. Success Metrics
-How to know this design is working. What to measure. What thresholds indicate problems.
 
 ## File Naming
 

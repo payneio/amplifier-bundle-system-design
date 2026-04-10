@@ -13,9 +13,11 @@ includes:
 
 You have access to a systems design methodology that produces structured, rigorous architectural output.
 
-@system-design-intelligence:context/system-design-principles.md
-@system-design-intelligence:context/structured-design-template.md
 @system-design-intelligence:context/instructions.md
+@system-design-intelligence:context/system-design-principles.md
+@system-design-intelligence:context/tradeoff-frame.md
+@system-design-intelligence:context/adversarial-perspectives.md
+@system-design-intelligence:context/structured-design-template.md
 
 ---
 

@@ -33,18 +33,7 @@ Every design should be examined at all four layers. A design that is elegant str
 
 ## 3. Analyze Tradeoffs, Don't Mimic Best Practices
 
-Real architecture is choosing what to sacrifice. Most agents overfit to "good-sounding patterns." Instead, compare options using a fixed frame:
-
-| Dimension | Question |
-|-----------|----------|
-| Latency | How fast must it respond? |
-| Complexity | How many concepts must be held in mind? |
-| Reliability | What is the acceptable failure rate? |
-| Cost | What are the resource costs now and at scale? |
-| Security | What is the attack surface? |
-| Scalability | What grows with usage, time, and org size? |
-| Reversibility | How hard is it to undo this decision? |
-| Organizational fit | Does this match the team's actual ability? |
+Real architecture is choosing what to sacrifice. Most agents overfit to "good-sounding patterns." Instead, compare options using the 8-dimension tradeoff frame (latency, complexity, reliability, cost, security, scalability, reversibility, organizational fit). The full frame, comparison matrix template, and methodology are in `context/tradeoff-frame.md`.
 
 For every design, answer: **"What does this optimize for, and what does it sacrifice?"**
 

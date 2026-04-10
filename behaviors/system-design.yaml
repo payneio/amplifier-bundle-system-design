@@ -4,7 +4,7 @@ bundle:
   description: |
     System design methodology behavior.
     Loads design principles, structured output template, and standing orders
-    into the root session context. Provides /design and /design-review modes.
+    into the root session context. Provides /systems-design and /systems-design-review modes.
 
 # Explicit dependency on the modes behavior for namespace resolution
 # (modes:context/modes-instructions.md needs the "modes" namespace registered)
@@ -13,7 +13,7 @@ bundle:
 includes:
   - bundle: git+https://github.com/microsoft/amplifier-bundle-modes@main#subdirectory=behaviors/modes.yaml
 
-# Mode hook to discover system-design modes (design, design-review)
+# Mode hook to discover systems-design modes (systems-design, systems-design-review)
 # TODO: When published to git, replace absolute path with:
 #   "@system-design-intelligence:modes"
 # or a git+https:// URL. The @namespace syntax does not resolve at mount time.

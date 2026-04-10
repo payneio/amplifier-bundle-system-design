@@ -4,7 +4,7 @@ An Amplifier bundle that provides a structured systems design methodology for ag
 
 ## What it does
 
-Adds a `/design` mode, specialist agents, design skills, and multi-step recipes to any Amplifier session. When activated, it guides structured exploration of system architecture before any code is written.
+Adds a `/systems-design` mode, specialist agents, design skills, and multi-step recipes to any Amplifier session. When activated, it guides structured exploration of system architecture before any code is written.
 
 ```
 amplifier bundle add git+https://github.com/<org>/amplifier-system-design@main --app
@@ -35,13 +35,13 @@ amplifier bundle add git+https://github.com/<org>/amplifier-system-design@main#s
 │   ├── adversarial-perspectives.md  # 5 review lenses
 │   └── structured-design-template.md  # Output template
 ├── modes/
-│   ├── system-design.md          # /design — 8-phase exploration
-│   └── design-review.md          # /design-review — 6-step evaluation
+│   ├── systems-design.md          # /systems-design — 8-phase exploration
+│   └── systems-design-review.md  # /systems-design-review — 6-step evaluation
 ├── modules/
 │   └── hooks-design-context/     # Hook: injects design doc awareness
 ├── recipes/
-│   ├── architecture-review.yaml  # Staged, 2 approval gates
-│   ├── design-exploration.yaml   # Parallel 3-archetype generation
+│   ├── systems-design-review.yaml # Staged, 2 approval gates
+│   ├── systems-design-exploration.yaml # Parallel 3-archetype generation
 │   └── codebase-understanding.yaml  # Sequential survey
 ├── skills/
 │   ├── adversarial-review/       # Fork skill (5 parallel review agents)
@@ -62,7 +62,7 @@ This bundle uses all seven Amplifier mechanisms. Each has a specific role:
 
 | Mechanism | Instances | Purpose |
 |-----------|-----------|---------|
-| **Modes** | `/design`, `/design-review` | Tool policy enforcement during design phases |
+| **Modes** | `/systems-design`, `/systems-design-review` | Tool policy enforcement during design phases |
 | **Agents** | `systems-architect`, `systems-design-critic`, `systems-design-writer` | Isolated sub-sessions with focused model roles |
 | **Skills** | 5 (1 fork, 4 inline) | On-demand design expertise |
 | **Recipes** | 3 | Multi-step workflows with checkpointing |
@@ -79,7 +79,7 @@ See `docs/amplifier-facilities/agent-mechanisms.md` for how these mechanisms com
 Enter design mode to explore a system architecture:
 
 ```
-/design
+/systems-design
 ```
 
 This constrains tools to read-only, injects design methodology guidance, and walks through 8 phases: scope, prior art, architecture generation (3 archetypes), tradeoff analysis, risk review, decision, documentation, and next steps.
@@ -89,7 +89,7 @@ This constrains tools to read-only, injects design methodology guidance, and wal
 Review an existing design document:
 
 ```
-/design-review
+/systems-design-review
 ```
 
 Six-step evaluation: read the document, identify claims, stress-test assumptions, analyze tradeoffs, grade coverage, and produce a findings report.
@@ -101,12 +101,12 @@ Run multi-step workflows with agent handoffs:
 ```python
 # Architecture review (staged, 2 approval gates)
 recipes(operation="execute",
-        recipe_path="@system-design-intelligence:recipes/architecture-review.yaml",
+        recipe_path="@system-design-intelligence:recipes/systems-design-review.yaml",
         context={"target_path": "src/", "focus_areas": "authentication, caching"})
 
 # Design exploration (parallel 3-archetype generation)
 recipes(operation="execute",
-        recipe_path="@system-design-intelligence:recipes/design-exploration.yaml",
+        recipe_path="@system-design-intelligence:recipes/systems-design-exploration.yaml",
         context={"problem_statement": "How should we handle user sessions at scale?"})
 
 # Codebase understanding (sequential survey)

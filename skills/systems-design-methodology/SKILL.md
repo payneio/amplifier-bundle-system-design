@@ -1,11 +1,11 @@
 ---
-name: system-design-methodology
-description: "Use when the /system-design mode is active. 8-phase structured design methodology -- problem framing, constraints, candidate architectures, tradeoff analysis, risk review, refinement, migration planning, and documentation. Governs conversation flow, delegation patterns, and user validation checkpoints."
+name: systems-design-methodology
+description: "Use when the /systems-design mode is active. 8-phase structured design methodology -- problem framing, constraints, candidate architectures, tradeoff analysis, risk review, refinement, migration planning, and documentation. Governs conversation flow, delegation patterns, and user validation checkpoints."
 ---
 
 # System Design Methodology
 
-Companion skill for the `/system-design` mode. The mode gates tools; this skill governs behavior.
+Companion skill for the `/systems-design` mode. The mode gates tools; this skill governs behavior.
 
 ## Core Rule
 

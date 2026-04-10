@@ -1,4 +1,4 @@
-name: "design-exploration"
+name: "systems-design-exploration"
 description: "Explore 3 architectural alternatives in parallel, evaluate against tradeoff framework, and synthesize a recommendation"
 version: "1.0.0"
 author: "System Design Intelligence"

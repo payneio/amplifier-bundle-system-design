@@ -1,4 +1,4 @@
-name: "architecture-review"
+name: "systems-design-review"
 description: "Multi-stage architecture review with approval gates between reconnaissance, analysis, and report phases"
 version: "1.0.0"
 author: "System Design Intelligence"
@@ -25,7 +25,7 @@ tags: ["architecture", "review", "system-design", "staged", "approval-gates"]
 
 context:
   target_path: ""                                    # Required: path to codebase or directory to review
-  output_path: "docs/designs/architecture-review.md" # Optional: where to write the final report
+  output_path: "docs/designs/systems-design-review.md" # Optional: where to write the final report
   perspectives:
     - "design-integrity"
     - "failure-modes"

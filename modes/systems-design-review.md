@@ -1,6 +1,6 @@
 ---
 mode:
-  name: design-review
+  name: systems-design-review
   description: Evaluate an existing design or proposed change against the codebase -- multi-perspective review for integrity, constraints, failure modes, and hidden complexity.
   tool_policies:
     safe:
@@ -15,7 +15,7 @@ mode:
       - recipes
       # -- Design-specific policy (diverges from foundation) --
       # todo: tracking review findings and action items across steps.
-      # mode: users manage their own transitions (e.g. /design-review -> /system-design).
+      # mode: users manage their own transitions (e.g. /systems-design-review -> /systems-design).
       # team_knowledge: "who owns this service?" and "what depends on this?" are core review questions.
       - todo
       - mode
@@ -37,7 +37,7 @@ mode:
 Evaluating an existing design or proposed architectural change. Write tools are
 blocked -- this mode produces assessments, not code.
 
-**Companion skill:** `design-review-methodology` -- load it at mode entry for the
+**Companion skill:** `systems-design-review-methodology` -- load it at mode entry for the
 full 6-step workflow, delegation patterns, and user validation checkpoints.
 
 ## Agents
@@ -51,7 +51,7 @@ full 6-step workflow, delegation patterns, and user validation checkpoints.
 
 | Skill | Step |
 |-------|------|
-| `design-review-methodology` | All -- companion skill for this mode |
+| `systems-design-review-methodology` | All -- companion skill for this mode |
 | `adversarial-review` | 3 (Option B) -- parallel 5-perspective stress test |
 | `tradeoff-analysis` | 4 -- validating stated vs actual tradeoffs |
 

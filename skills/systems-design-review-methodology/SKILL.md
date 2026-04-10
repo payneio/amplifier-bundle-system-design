@@ -1,11 +1,11 @@
 ---
-name: design-review-methodology
-description: "Use when the /design-review mode is active. 6-step design review methodology -- understand the design, evaluate against codebase, adversarial analysis, tradeoff validation, synthesis, and action items. Governs conversation flow, delegation patterns, and user validation checkpoints."
+name: systems-design-review-methodology
+description: "Use when the /systems-design-review mode is active. 6-step design review methodology -- understand the design, evaluate against codebase, adversarial analysis, tradeoff validation, synthesis, and action items. Governs conversation flow, delegation patterns, and user validation checkpoints."
 ---
 
 # Design Review Methodology
 
-Companion skill for the `/design-review` mode. The mode gates tools; this skill governs behavior.
+Companion skill for the `/systems-design-review` mode. The mode gates tools; this skill governs behavior.
 
 ## Core Rule
 

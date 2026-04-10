@@ -1,6 +1,6 @@
 ---
 mode:
-  name: system-design
+  name: systems-design
   description: Structured system design exploration -- model the system, explore alternatives, analyze tradeoffs, validate design section-by-section with the user.
   tool_policies:
     safe:
@@ -38,7 +38,7 @@ mode:
 Structured design exploration. Write tools are blocked -- this mode produces
 design thinking, not files. Document creation is delegated to `systems-design-writer`.
 
-**Companion skill:** `system-design-methodology` -- load it at mode entry for the
+**Companion skill:** `systems-design-methodology` -- load it at mode entry for the
 full 8-phase workflow, delegation patterns, and user validation checkpoints.
 
 ## Agents
@@ -53,7 +53,7 @@ full 8-phase workflow, delegation patterns, and user validation checkpoints.
 
 | Skill | Phase |
 |-------|-------|
-| `system-design-methodology` | All -- companion skill for this mode |
+| `systems-design-methodology` | All -- companion skill for this mode |
 | `architecture-primitives` | 3 -- selecting patterns for candidates |
 | `tradeoff-analysis` | 4 -- detailed tradeoff methodology |
 | `adversarial-review` | 5 -- parallel 5-perspective stress test |

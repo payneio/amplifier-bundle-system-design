@@ -25,14 +25,23 @@ The bundle is called `systems-design`. Ships as standalone (includes foundation)
 5 context files always-loaded into every root session (~4k tokens total). These provide shared vocabulary and reference frameworks used across modes, agents, and skills. They do NOT contain methodology (that's skills) or tool governance (that's modes).
 
 | File | Purpose | ~Tokens |
-|------|---------|---------|
-| `context/instructions.md` | Detection & routing standing orders -- recognizes design requests and routes to the right mode/recipe/skill. Maps trigger phrases to mechanisms. No methodology, just routing. | ~800 |
+|------|---------|---------| 
+| `context/instructions.md` | Contains a STANDING-ORDER block with a routing table mapping trigger phrases (e.g., "design a system for...", "review this architecture...") to modes and recipes. No methodology, just routing. | ~800 |
 | `context/system-design-principles.md` | 6 core thinking tools: map first, four layers, tradeoff analysis, optimize/sacrifice framing, causal tracing, simplest-acceptable design | ~800 |
 | `context/tradeoff-frame.md` | 8-dimension evaluation framework (latency, complexity, reliability, cost, security, scalability, reversibility, organizational fit) with matrix template | ~800 |
 | `context/adversarial-perspectives.md` | 5 reviewer perspectives (SRE, security, staff engineer, finance, operator) with driving questions and output structure | ~800 |
 | `context/structured-design-template.md` | 11-section output template for design documents (problem framing through success metrics) | ~800 |
 
-Design rationale: `instructions.md` is the router. The other 4 are reference frameworks that agents and skills point to. Always loaded because they're referenced across multiple mechanisms -- loading once (~4k tokens) is cheaper than having every agent re-load them.
+Design rationale: `instructions.md` is the router. The other 4 are reference frameworks that agents and skills point to. Always loaded because they're referenced across multiple mechanisms -- root session loads them for the orchestration layer -- the LLM needs these frameworks to route, coordinate, and discuss with the user. Agents independently load the subset they need via @mentions in their own sub-session context.
+
+**Routing mechanism (`instructions.md`)**:
+1. `instructions.md` contains a STANDING-ORDER block with a routing table mapping trigger phrases to modes/recipes
+2. When the LLM detects a matching trigger, it recommends the mode and explains why
+3. When the user consents (says "yes", "go ahead") or types a slash command (which is implicit consent), the LLM calls `mode(operation="set", name="<mode>")` to activate
+4. Due to gate_policy "warn", the first call is blocked; the LLM calls again to confirm
+5. The mode activates and its companion skill auto-loads
+
+Note: `instructions.md` includes a mode-active guard: if a mode is already active (detected by `<system-reminder source="mode-...">` in context), the routing table is skipped and the active mode's guidance is followed directly.
 
 ---
 
@@ -61,6 +70,10 @@ Two modes governing interactive sessions. Modes provide tool governance and beha
 - **Transitions**: Can transition to `/systems-design`. Cannot be cleared (allow_clear: false).
 
 Key design decision: Both modes have nearly identical tool policies (same core principle: design work reads but doesn't write). The difference is the companion skill loaded at entry. The mode is the governance shell; the skill is the brain.
+
+Tool policy definitions: 'safe' = works normally. 'warn' = first call is blocked with a warning message; the LLM must call again to proceed (built-in Amplifier behavior). 'blocked' = tool is disabled entirely.
+
+team_knowledge is included as a safe tool because design work benefits from checking what the team has already built and decided -- existing architectural decisions, conventions, and capabilities inform new design work.
 
 ---
 
@@ -105,7 +118,7 @@ Three specialist agents owned by the bundle, plus foundation agent usage. Agents
 ### Foundation agent usage
 
 | Agent | When used | By whom |
-|-------|-----------|---------|
+|-------|-----------|---------| 
 | `foundation:explorer` | Codebase reconnaissance (survey structure, find files) | Recipes, modes (via delegation) |
 | `foundation:zen-architect` | Module-level design (interfaces, contracts, function signatures) | systems-architect delegates down |
 | `foundation:git-ops` | Commit and push operations | systems-design-writer |
@@ -139,11 +152,11 @@ On-demand knowledge loaded via load_skill(). Three categories: methodology skill
   2. Constraint extraction
   3. Candidate exploration via architect/DESIGN -- 3 candidates
   4. Tradeoff analysis via architect/DESIGN -- 8-dimension frame
-  5. Risk assessment -- delegate to critic or suggest adversarial-review skill
+  5. Risk assessment -- delegate to critic or suggest adversarial-review skill. Decision rule: delegate to systems-design-critic when the conversation has accumulated codebase context (the critic can read the actual files). Suggest the adversarial-review fork skill for self-contained designs without a codebase to examine, or when the user explicitly requests multi-perspective parallel analysis.
   6. Design refinement via architect/DESIGN
-  7. Migration planning
+  7. Migration planning -- delegate to systems-architect (DESIGN) to produce: rollout strategy (phased, canary, big-bang with justification), backward compatibility approach, rollback triggers and procedure, success/failure signals for each phase, estimated timeline and risk windows
   8. Document production -- delegate to writer with ALL validated content
-- **Key behaviors**: Blocks progression at Phase 1 until user validates system map. May revisit earlier phases. Loads other skills on demand (architecture-primitives at Phase 3 if patterns unclear, tradeoff-analysis at Phase 4 if tradeoffs contested).
+- **Key behaviors**: Blocks progression at Phase 1 until user validates system map. May revisit earlier phases when: (a) user explicitly requests it, (b) a later phase reveals an invalid assumption from an earlier phase, or (c) the architect identifies a constraint that invalidates the current system map. Loads other skills on demand (architecture-primitives at Phase 3 if patterns unclear, tradeoff-analysis at Phase 4 if tradeoffs contested).
 
 **`systems-design-review-methodology`**
 - **Type**: Inline skill
@@ -178,7 +191,7 @@ On-demand knowledge loaded via load_skill(). Three categories: methodology skill
 - **Model role**: critique
 - **Purpose**: Multi-perspective adversarial review launching 5 parallel critic agents
 - **Loaded when**: User invokes during design, or at Phase 5 as alternative to delegating to systems-design-critic
-- **Key behavior**: Reads the design, spawns 5 parallel agents via delegate() (SRE, security, staff engineer, finance, operator), waits for all 5, synthesizes into unified risk assessment
+- **Key behavior**: The fork skill receives the design content via the `$ARGUMENTS` variable (passed from load_skill invocation) or reads design files from the session's working directory. Each of the 5 parallel agents receives the same design content in their delegation instruction. Spawns 5 parallel agents via delegate() (SRE, security, staff engineer, finance, operator), waits for all 5, synthesizes into unified risk assessment.
 - **Output**: Critical Risks, Significant Concerns, Observations, What the Design Gets Right, Recommended Next Steps
 
 ### System-type skills (loaded conditionally based on system type)
@@ -230,9 +243,9 @@ Data flow: Explorer does reconnaissance, architect analyzes progressively. Each 
 | Step | Agent | Produces | Notes |
 |------|-------|----------|-------|
 | 1. frame-problem | systems-architect (ANALYZE) | problem_frame | -- |
-| 2. generate-candidates | systems-architect (DESIGN) | 3 candidates | 3-way parallel |
+| 2. generate-candidates | systems-architect (DESIGN) | 3 candidates | 3 parallel delegate() calls in a single recipe step, one per candidate archetype (simplest viable, most scalable, most robust). Each delegation receives the problem_frame and returns one candidate. |
 | 3. evaluate-tradeoffs | systems-architect (DESIGN) | tradeoff_evaluation | 8-dimension frame |
-| 4. adversarial-review | systems-design-critic | adversarial_review | Conditional: only if `with_adversarial_review == 'true'` |
+| 4. adversarial-review | systems-design-critic | adversarial_review | Conditional: only if `with_adversarial_review == 'true'`. Recipe context variable `with_adversarial_review` (default: 'false') passed at recipe invocation. Example: `recipes(operation='execute', recipe_path='...', context={'with_adversarial_review': 'true'})` |
 
 ### `systems-design-cycle`
 
@@ -243,7 +256,7 @@ Data flow: Explorer does reconnaissance, architect analyzes progressively. Each 
 | Step | Agent | Produces | Gate |
 |------|-------|----------|------|
 | 1. build-system-map | systems-architect (ANALYZE) | system_map | -- |
-| 2. extract-constraints | systems-architect | constraints_analysis | **candidates** |
+| 2. extract-constraints | systems-architect (ANALYZE) | constraints_analysis | **candidates** |
 | 3. generate-candidates | systems-architect (DESIGN) | 3 candidates | |
 | 4. evaluate-tradeoffs | systems-architect (DESIGN) | tradeoff_evaluation | **risk-and-refinement** |
 | 5. adversarial-review | systems-design-critic | risk_assessment | |
@@ -267,13 +280,15 @@ User approval messages are passed to subsequent steps for steering.
 |------|-------|----------|------|
 | 1. survey-codebase | foundation:explorer | codebase_survey | -- |
 | 2. identify-boundaries | systems-architect (ASSESS) | system_map | **analysis** |
-| 3. perspective-analysis | systems-architect (ASSESS) | 5-perspective analysis | |
+| 3. adversarial-analysis | systems-design-critic | adversarial_analysis | |
 | 4. synthesize-risks | systems-design-critic | risk_assessment | **report** |
 | 5. write-report | systems-design-writer | final_report | |
 
 2 approval gates:
 1. **analysis** -- user approves survey and map before deep analysis
 2. **report** -- user approves risk assessment before final report
+
+Note: The `systems-design-review` recipe and `systems-design-review` mode share the same name intentionally. Amplifier distinguishes them by type -- the mode is a `.md` file in `modes/` and the recipe is a `.yaml` file in `recipes/`. They are invoked differently: the mode via slash command (`/systems-design-review`) or `mode(operation="set")`, and the recipe via `recipes(operation="execute")`.
 
 ### Mode vs recipe relationship
 
@@ -297,15 +312,16 @@ One hook module owned by the bundle.
 - **Type**: Python hook module (code-decided, fires on lifecycle events)
 - **Purpose**: Ambient design document awareness -- scans `docs/designs/*.md` and injects inventory of existing designs before every LLM call
 - **When it fires**: Before each LLM call (pre-completion hook)
-- **What it does**: Scans `docs/designs/` for markdown files, extracts titles and dates, injects compact inventory into LLM context. Agent always knows what designs exist without being told.
+- **What it does**: Scans `docs/designs/` for markdown files, extracts titles and dates, injects compact inventory into LLM context. Agent always knows what designs exist without being told. Extraction method: parses the first `#` heading in each file for the title; parses the filename date prefix (YYYY-MM-DD) for the date.
 - **Token cost**: Minimal -- just a list of filenames and titles, not full documents
 - **Why a hook and not a skill or context file**: Needs to run code (scan filesystem at runtime) and fire automatically (no explicit loading). Skills are on-demand; context files are static. This is dynamic and ambient.
+- **Missing directory behavior**: When `docs/designs/` does not exist (e.g., fresh project), the hook silently injects nothing -- no error, no warning, no output.
 
 ---
 
 ## Section 8: Interaction Map
 
-How mechanisms connect across the four primary user journeys.
+How mechanisms connect across the six primary user journeys.
 
 ### Journey 1: "Design a new system" (interactive)
 
@@ -393,6 +409,29 @@ User runs codebase-understanding recipe (or instructions.md routes)
   -> Step 2: systems-architect (ASSESS) -> boundary_analysis
   -> Step 3: systems-architect (ASSESS) -> flow_analysis
   -> Step 4: systems-architect (ASSESS) -> architectural_overview
+```
+
+### Journey 5: "Quick design exploration" (automated pipeline)
+
+```
+User runs systems-design-exploration recipe (with optional adversarial review)
+  -> Step 1: systems-architect (ANALYZE) -> problem_frame
+  -> Step 2: 3x parallel systems-architect (DESIGN) -> 3 candidates
+  -> Step 3: systems-architect (DESIGN) -> tradeoff_evaluation (8-dimension frame)
+  -> Step 4 (conditional): systems-design-critic -> adversarial_review
+```
+
+### Journey 6: "Architecture review" (automated pipeline)
+
+```
+User runs systems-design-review recipe
+  -> Step 1: foundation:explorer -> codebase_survey
+  -> Step 2: systems-architect (ASSESS) -> system_map
+  -- APPROVAL GATE: analysis --
+  -> Step 3: systems-design-critic -> adversarial_analysis (5 perspectives)
+  -> Step 4: systems-design-critic -> risk_assessment
+  -- APPROVAL GATE: report --
+  -> Step 5: systems-design-writer -> final_report
 ```
 
 ### Ambient behavior (always active)

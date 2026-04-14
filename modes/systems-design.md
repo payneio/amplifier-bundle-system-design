@@ -2,7 +2,7 @@
 mode:
   name: systems-design
   description: Structured system design exploration -- model the system, explore alternatives, analyze tradeoffs, validate design section-by-section with the user.
-  tool_policies:
+  tools:
     safe:
       - read_file
       - glob
@@ -29,7 +29,7 @@ mode:
       - edit_file
       - apply_patch
       - python_check
-    default_action: block
+  default_action: block
   allow_clear: false
 ---
 

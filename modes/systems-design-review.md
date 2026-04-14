@@ -2,7 +2,7 @@
 mode:
   name: systems-design-review
   description: Evaluate an existing design or proposed change against the codebase -- multi-perspective review for integrity, constraints, failure modes, and hidden complexity.
-  tool_policies:
+  tools:
     safe:
       - read_file
       - glob
@@ -28,7 +28,7 @@ mode:
       - edit_file
       - apply_patch
       - python_check
-    default_action: block
+  default_action: block
   allow_clear: false
 ---
 

@@ -72,6 +72,9 @@ Not every design question needs the full pipeline. Match the approach to the sco
 - `system-type-distributed` -- consensus, consistency models, replication, partitioning, failure detection
 - `system-type-enterprise-integration` -- legacy modernization, strangler fig, API gateways, data integration
 - `system-type-edge-offline` -- offline-first, sync protocols, conflict resolution, constrained resources
+- `system-type-spa` -- single-page applications, client-side routing, state management, rendering strategies, PWA
+- `system-type-peer-to-peer` -- P2P topologies, NAT traversal, peer discovery, data distribution, Sybil resistance
+- `system-type-azure` -- Azure compute, identity (Entra ID), networking, data platform, messaging, deployment, cost management
 
 **Skills (design philosophies):**
 - `design-philosophy-linux` -- mechanism vs policy, composability, Unix philosophy as design lens

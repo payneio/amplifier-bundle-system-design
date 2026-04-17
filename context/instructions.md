@@ -62,6 +62,22 @@ Not every design question needs the full pipeline. Match the approach to the sco
 - `system-type-web-service` -- domain patterns for web services
 - `system-type-event-driven` -- domain patterns for event-driven systems
 
+**Skills (system types — additional):**
+- `system-type-data-pipeline` -- batch and streaming pipelines, DAG scheduling, data quality, backfill
+- `system-type-workflow-orchestration` -- long-running processes, sagas, durable execution, human-in-the-loop
+- `system-type-cli-tool` -- CLI tools and developer SDKs, configuration layering, plugin architecture
+- `system-type-real-time` -- persistent connections, state sync, CRDTs, presence, fan-out
+- `system-type-multi-tenant-saas` -- tenant isolation, noisy neighbor, billing metering, data partitioning
+- `system-type-ml-serving` -- model serving, feature stores, training pipelines, LLM patterns
+- `system-type-distributed` -- consensus, consistency models, replication, partitioning, failure detection
+- `system-type-enterprise-integration` -- legacy modernization, strangler fig, API gateways, data integration
+- `system-type-edge-offline` -- offline-first, sync protocols, conflict resolution, constrained resources
+
+**Skills (design philosophies):**
+- `design-philosophy-linux` -- mechanism vs policy, composability, Unix philosophy as design lens
+- `design-philosophy-domain-driven` -- bounded contexts, ubiquitous language, aggregates, context mapping
+- `design-philosophy-object-oriented` -- SOLID, composition over inheritance, actor model, design patterns
+
 **Agents:**
 - `systems-architect` -- system-level design (ANALYZE, DESIGN, ASSESS modes)
 - `systems-design-critic` -- adversarial review from 5 perspectives (for recipe/delegation use)

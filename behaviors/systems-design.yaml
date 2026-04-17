@@ -40,7 +40,7 @@ tools:
     source: git+https://github.com/microsoft/amplifier-module-tool-skills@main
     config:
       skills:
-        - "@systems-design:skills"
+        - "git+https://github.com/payneio/amplifier-bundle-systems-design@main#subdirectory=skills"
 
 agents:
   include:

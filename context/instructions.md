@@ -52,8 +52,8 @@ Not every design question needs the full pipeline. Match the approach to the sco
 - `bundle-behavioral-spec` -- generate behavioral specification for an Amplifier bundle
 
 **Skills (methodology):**
-- `systems-design-methodology` -- companion skill for `/systems-design` mode (8 phases)
-- `systems-design-review-methodology` -- companion skill for `/systems-design-review` mode (6 steps)
+- `systems-design-methodology` -- companion skill for `/systems-design` mode (9 phases, includes mandatory system classification)
+- `systems-design-review-methodology` -- companion skill for `/systems-design-review` mode (7 steps, includes mandatory system classification)
 
 **Skills (domain):**
 - `adversarial-review` -- parallel 5-perspective stress test (fork skill)

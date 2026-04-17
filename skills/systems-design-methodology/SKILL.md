@@ -1,11 +1,17 @@
 ---
 name: systems-design-methodology
-description: "Use when the /systems-design mode is active. 8-phase structured design methodology -- problem framing, constraints, candidate architectures, tradeoff analysis, risk review, refinement, migration planning, and documentation. Governs conversation flow, delegation patterns, and user validation checkpoints."
+description: "Use when the /systems-design mode is active. 9-phase structured design methodology -- problem framing, system classification, constraints, candidate architectures, tradeoff analysis, risk review, refinement, migration planning, and documentation. Governs conversation flow, delegation patterns, and user validation checkpoints."
 ---
 
 # System Design Methodology
 
 Companion skill for the `/systems-design` mode. The mode gates tools; this skill governs behavior.
+
+**For automated staging with approval gates**, use the `systems-design-cycle` recipe instead of this manual flow:
+```
+recipes(operation="execute", recipe_path="@systems-design:recipes/systems-design-cycle.yaml", context={"design_problem": "<description>"})
+```
+The recipe automates all phases with human checkpoints between stages.
 
 ## Core Rule
 
@@ -35,7 +41,52 @@ Present the architect's system map to the user. Ask: **"Does this capture the pr
 
 Do NOT proceed until the user validates the problem framing. If they correct the map, re-delegate with the corrections.
 
-### Phase 2: Constraints and Assumptions
+### Phase 2: Classify the System
+
+**This phase is mandatory. Do not skip it. Do not proceed to candidate architectures without completing it.**
+
+Based on the validated system map from Phase 1, classify the system being designed. Produce a brief taxonomy:
+
+**System types** -- which of these apply? List ALL that match, not just the primary one:
+
+| Type | Skill | Applies when... |
+|------|-------|-----------------|
+| Web service / API | `system-type-web-service` | HTTP endpoints, REST/GraphQL, request-response |
+| Event-driven | `system-type-event-driven` | Message queues, event logs, pub/sub, hooks, reactive patterns |
+| Data pipeline | `system-type-data-pipeline` | Batch/streaming processing, ETL, DAG scheduling |
+| Workflow orchestration | `system-type-workflow-orchestration` | Multi-step processes, sagas, durable execution |
+| CLI tool | `system-type-cli-tool` | Command-line interface, subcommands, plugin architecture |
+| Real-time | `system-type-real-time` | WebSockets, persistent connections, state sync |
+| Multi-tenant SaaS | `system-type-multi-tenant-saas` | Tenant isolation, shared infrastructure, billing |
+| ML serving | `system-type-ml-serving` | Model serving, feature stores, inference pipelines |
+| Distributed system | `system-type-distributed` | Consensus, replication, partitioning, multi-node coordination |
+| Enterprise integration | `system-type-enterprise-integration` | Legacy modernization, API gateways, data integration |
+| Edge / offline-first | `system-type-edge-offline` | Offline operation, sync protocols, constrained resources |
+| Single-page app | `system-type-spa` | Client-side routing, state management, rendering strategies |
+| Peer-to-peer | `system-type-peer-to-peer` | P2P topologies, NAT traversal, decentralized coordination |
+| Azure-hosted | `system-type-azure` | Azure compute, identity, networking, managed services |
+
+**Design philosophies** -- which does the system claim or embody?
+
+| Philosophy | Skill | Applies when... |
+|------------|-------|-----------------|
+| Linux/Unix | `design-philosophy-linux` | Mechanism vs policy, composability, small sharp tools |
+| Domain-driven | `design-philosophy-domain-driven` | Bounded contexts, ubiquitous language, aggregates |
+| Object-oriented | `design-philosophy-object-oriented` | SOLID, composition over inheritance, protocols/traits |
+
+**After classifying, immediately load ALL matching skills:**
+```
+load_skill(skill_name="system-type-event-driven")
+load_skill(skill_name="system-type-cli-tool")
+load_skill(skill_name="design-philosophy-linux")
+# ... every skill that matches
+```
+
+Present the classification to the user: **"Based on the system map, I've classified this as [types]. I've loaded domain skills for [list]. Does this match? Anything to add?"**
+
+**Why this matters:** Domain skills contain canonical patterns, failure modes, and anti-patterns for each system type. Loading them before generating candidates ensures the architect has the right evaluative frame -- candidates that violate domain-specific patterns will be caught immediately rather than discovered in risk review.
+
+### Phase 3: Constraints and Assumptions
 
 Surface everything assumed but not stated:
 
@@ -47,21 +98,23 @@ Surface everything assumed but not stated:
 
 Present as a numbered list of explicit assumptions. Ask: **"Which of these are wrong? What constraints am I missing?"**
 
-### Phase 3: Candidate Architectures
+### Phase 4: Candidate Architectures
 
-Delegate to the architect to generate candidates using the validated system map and constraints:
+Delegate to the architect to generate candidates using the validated system map, classification, and constraints:
 
 ```
 delegate(
   agent="systems-design:systems-architect",
   instruction="DESIGN mode. Using this validated system map and constraints:
     [system map from Phase 1, with user corrections]
-    [constraints and assumptions from Phase 2, with user corrections]
+    [system classification from Phase 2]
+    [constraints and assumptions from Phase 3, with user corrections]
     Generate 3 candidate architectures:
     1. Simplest viable -- minimum design meeting core requirements
     2. Most scalable -- optimized for growth
     3. Most robust -- optimized for reliability and operational simplicity
-    For each: components, boundaries, data flows, technology choices, what it optimizes for.",
+    For each: components, boundaries, data flows, technology choices, what it optimizes for.
+    Apply domain patterns from the system classification -- candidates should respect [system type] conventions.",
   context_depth="recent",
   context_scope="agents"
 )
@@ -71,7 +124,7 @@ Present the architect's candidates to the user. Ask: **"Which direction feels ri
 
 Load the `architecture-primitives` skill if pattern selection is unclear.
 
-### Phase 4: Tradeoff Analysis
+### Phase 5: Tradeoff Analysis
 
 Delegate to the architect to evaluate the user's preferred candidates against the 8-dimension tradeoff frame:
 
@@ -92,7 +145,7 @@ Present the architect's comparison matrix to the user. Ask: **"Do these ratings 
 
 Load the `tradeoff-analysis` skill for deeper methodology if the tradeoffs are contested or unclear.
 
-### Phase 5: Risks and Failure Modes
+### Phase 6: Risks and Failure Modes
 
 For the leading candidate, identify:
 - Critical failure modes and blast radius
@@ -103,9 +156,11 @@ For the leading candidate, identify:
 
 If the design warrants deep adversarial review, delegate to `systems-design:systems-design-critic` or suggest `/adversarial-review`.
 
+**Pass the system classification to the critic** so it can apply domain-specific failure modes.
+
 Present risks ranked by severity. Ask: **"Which of these risks are acceptable? Which need mitigation in the design?"**
 
-### Phase 6: Design Refinement
+### Phase 7: Design Refinement
 
 Delegate to the architect to incorporate the user's risk feedback:
 
@@ -113,7 +168,7 @@ Delegate to the architect to incorporate the user's risk feedback:
 delegate(
   agent="systems-design:systems-architect",
   instruction="DESIGN mode -- refinement pass.
-    Current architecture: [leading candidate from Phase 3/4]
+    Current architecture: [leading candidate from Phase 4/5]
     User feedback from risk review:
     - Unacceptable risks requiring mitigation: [list]
     - Accepted limitations: [list]
@@ -126,7 +181,7 @@ delegate(
 
 Present the architect's refined design to the user. Ask: **"Is this the design you want to proceed with?"**
 
-### Phase 7: Migration and Success Metrics
+### Phase 8: Migration and Success Metrics
 
 If this replaces or modifies an existing system:
 - Migration strategy (incremental vs big-bang)
@@ -138,7 +193,7 @@ If greenfield:
 - Success metrics and thresholds
 - What signals indicate the design is failing
 
-### Phase 8: Document the Design
+### Phase 9: Document the Design
 
 When the user approves the design, delegate to `systems-design:systems-design-writer`:
 
@@ -157,11 +212,11 @@ Pass ALL validated content from the conversation. The writer structures it -- it
 
 | Skill | When to load |
 |-------|-------------|
-| `architecture-primitives` | Phase 3 -- selecting patterns for candidates |
-| `tradeoff-analysis` | Phase 4 -- detailed tradeoff methodology |
-| `adversarial-review` | Phase 5 -- parallel 5-perspective stress test |
-| `system-type-web-service` | Phase 3 -- when designing web services or APIs |
-| `system-type-event-driven` | Phase 3 -- when designing event-driven or message-based systems |
+| `system-type-*` (all matching) | Phase 2 -- mandatory, load all that match the classification |
+| `design-philosophy-*` (all matching) | Phase 2 -- mandatory, load all that match |
+| `architecture-primitives` | Phase 4 -- selecting patterns for candidates |
+| `tradeoff-analysis` | Phase 5 -- detailed tradeoff methodology |
+| `adversarial-review` | Phase 6 -- parallel 5-perspective stress test |
 
 ## The Catalytic Question
 

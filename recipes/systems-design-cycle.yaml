@@ -1,29 +1,30 @@
 name: "systems-design-cycle"
-description: "End-to-end system design with approval gates -- problem framing, candidate architectures, risk assessment, refinement, and documentation"
-version: "1.0.0"
+description: "End-to-end system design with approval gates -- problem framing, system classification, candidate architectures, risk assessment, refinement, and documentation"
+version: "1.1.0"
 author: "System Design Intelligence"
 tags: ["design", "system-design", "staged", "approval-gates", "full-cycle"]
 
 # Staged system design cycle with approval gates.
 #
-# Four stages mapping to the 8-phase methodology:
+# Four stages mapping to the 9-phase methodology:
 #
-# Stage 1: Problem Framing (Phases 1-2)
+# Stage 1: Problem Framing (Phases 1-3)
 #   - systems-architect ANALYZE: build system map
+#   - Classify system types and design philosophies
 #   - Extract constraints and assumptions
-#   → Approval: User validates problem understanding
+#   -> Approval: User validates problem understanding and classification
 #
-# Stage 2: Candidates & Tradeoffs (Phases 3-4)
+# Stage 2: Candidates & Tradeoffs (Phases 4-5)
 #   - Generate 3 candidate architectures in parallel
 #   - Evaluate all candidates against 8-dimension tradeoff frame
-#   → Approval: User selects direction
+#   -> Approval: User selects direction
 #
-# Stage 3: Risk Assessment & Refinement (Phases 5-6)
+# Stage 3: Risk Assessment & Refinement (Phases 6-7)
 #   - Adversarial review from 5 perspectives
 #   - Refine chosen design incorporating risk feedback
-#   → Approval: User approves refined design
+#   -> Approval: User approves refined design
 #
-# Stage 4: Documentation (Phases 7-8)
+# Stage 4: Documentation (Phases 8-9)
 #   - Migration strategy and success metrics
 #   - systems-design-writer produces final document
 #
@@ -54,7 +55,7 @@ context:
 
 stages:
   # ==========================================================================
-  # Stage 1: Problem Framing (Phases 1-2)
+  # Stage 1: Problem Framing (Phases 1-3)
   # ==========================================================================
   - name: "problem-framing"
     steps:
@@ -85,15 +86,73 @@ stages:
           Be thorough. This framing drives everything downstream.
           Flag ambiguities and assumptions explicitly.
 
+      - id: "classify-system"
+        agent: "systems-design:systems-architect"
+        timeout: 600
+        output: "system_classification"
+        prompt: |
+          Based on the system map, classify this system by type and design philosophy.
+
+          Problem: {{design_problem}}
+          System map: {{system_map}}
+          Existing system: {{existing_system}}
+
+          **System types** -- which of these apply? List ALL that match, not just the primary one.
+          For each that applies, explain briefly WHY it applies (cite evidence from the system map):
+
+          - Web service / API (HTTP endpoints, REST/GraphQL, request-response)
+          - Event-driven (message queues, event logs, pub/sub, hooks, reactive patterns)
+          - Data pipeline (batch/streaming processing, ETL, DAG scheduling)
+          - Workflow orchestration (multi-step processes, sagas, durable execution)
+          - CLI tool (command-line interface, subcommands, plugin architecture)
+          - Real-time (WebSockets, persistent connections, state sync)
+          - Multi-tenant SaaS (tenant isolation, shared infrastructure, billing)
+          - ML serving (model serving, feature stores, inference pipelines)
+          - Distributed system (consensus, replication, partitioning, multi-node coordination)
+          - Enterprise integration (legacy modernization, API gateways, data integration)
+          - Edge / offline-first (offline operation, sync protocols, constrained resources)
+          - Single-page app (client-side routing, state management, rendering strategies)
+          - Peer-to-peer (P2P topologies, NAT traversal, decentralized coordination)
+          - Azure-hosted (Azure compute, identity, networking, managed services)
+
+          **Design philosophies** -- which should this system follow or claim?
+
+          - Linux/Unix (mechanism vs policy, composability, small sharp tools)
+          - Domain-driven (bounded contexts, ubiquitous language, aggregates)
+          - Object-oriented (SOLID, composition over inheritance, protocols/traits)
+
+          **Output format:**
+
+          SYSTEM TYPES:
+          - [type]: [why this applies]
+          - [type]: [why this applies]
+
+          DESIGN PHILOSOPHIES:
+          - [philosophy]: [why this applies]
+
+          DOMAIN SKILLS TO LOAD:
+          - system-type-[x]
+          - system-type-[y]
+          - design-philosophy-[z]
+
+          IMPLICATIONS FOR DESIGN:
+          For each classified type, note 1-2 key design implications that candidate
+          architectures must address (e.g., "as an event-driven system, candidates must
+          specify delivery guarantees and backpressure strategy").
+
+          Be thorough. Most real systems match 2-4 types. A system classified as only
+          one type is likely under-classified.
+
       - id: "extract-constraints"
         agent: "systems-design:systems-architect"
         timeout: 600
         output: "constraints_analysis"
         prompt: |
-          Based on this system map, extract every constraint and assumption
-          -- both explicit and implicit:
+          Based on this system map and classification, extract every constraint and
+          assumption -- both explicit and implicit:
 
           System map: {{system_map}}
+          System classification: {{system_classification}}
           Problem: {{design_problem}}
           Stated constraints: {{constraints}}
           Existing system: {{existing_system}}
@@ -118,22 +177,28 @@ stages:
           For each assumption, note: "If this is wrong, the impact is [X]."
 
   # ==========================================================================
-  # Stage 2: Candidates & Tradeoffs (Phases 3-4)
-  # Approval gate: User validates problem framing before generating designs
+  # Stage 2: Candidates & Tradeoffs (Phases 4-5)
+  # Approval gate: User validates problem framing and classification
   # ==========================================================================
   - name: "candidates"
     approval:
       required: true
       prompt: |
-        PROBLEM FRAMING COMPLETE
+        PROBLEM FRAMING & CLASSIFICATION COMPLETE
 
         System map:
         {{system_map}}
 
+        System classification:
+        {{system_classification}}
+
         Constraints and assumptions:
         {{constraints_analysis}}
 
-        Review the problem framing above.
+        Review the problem framing and system classification above.
+        The classification determines which domain patterns will be applied
+        to candidate architectures.
+
         - Approve to proceed with generating 3 candidate architectures.
         - Deny to stop and refine the problem framing interactively.
         - Include any corrections or priority guidance in your approval message.
@@ -150,8 +215,13 @@ stages:
 
           Problem: {{design_problem}}
           System map: {{system_map}}
+          System classification: {{system_classification}}
           Constraints: {{constraints_analysis}}
           User direction: {{_approval_message}}
+
+          **Apply domain patterns from the system classification.** The system has been
+          classified as specific types -- candidates must respect the conventions and
+          address the design implications noted in the classification.
 
           Design archetype guidance:
 
@@ -186,6 +256,7 @@ stages:
 
           Problem: {{design_problem}}
           System map: {{system_map}}
+          System classification: {{system_classification}}
           Constraints: {{constraints_analysis}}
 
           Candidate designs:
@@ -213,7 +284,7 @@ stages:
           6. **What would have to be true for this to be the wrong choice?**
 
   # ==========================================================================
-  # Stage 3: Risk Assessment & Refinement (Phases 5-6)
+  # Stage 3: Risk Assessment & Refinement (Phases 6-7)
   # Approval gate: User selects direction before investing in risk analysis
   # ==========================================================================
   - name: "risk-and-refinement"
@@ -243,10 +314,17 @@ stages:
 
           Problem: {{design_problem}}
           System map: {{system_map}}
+          System classification: {{system_classification}}
           Constraints: {{constraints_analysis}}
           All candidates: {{candidate_designs}}
           Tradeoff evaluation: {{tradeoff_evaluation}}
           User's chosen direction: {{_approval_message}}
+
+          **Use the system classification to focus your review.** Apply domain-specific
+          failure modes and anti-patterns from the classified system types. For example:
+          - If event-driven: check delivery guarantees, ordering, backpressure, dead letters
+          - If CLI tool: check plugin isolation, config conflicts, error reporting
+          - If distributed: check consistency model, partition handling, split-brain scenarios
 
           Stress-test the chosen design from 5 adversarial perspectives:
 
@@ -280,6 +358,7 @@ stages:
 
           Problem: {{design_problem}}
           System map: {{system_map}}
+          System classification: {{system_classification}}
           Constraints: {{constraints_analysis}}
           User's chosen direction: {{_approval_message}}
           All candidates (for reference): {{candidate_designs}}
@@ -303,7 +382,7 @@ stages:
              that the architect should NOT prescribe
 
   # ==========================================================================
-  # Stage 4: Documentation (Phases 7-8)
+  # Stage 4: Documentation (Phases 8-9)
   # Approval gate: User approves refined design before writing the document
   # ==========================================================================
   - name: "documentation"
@@ -333,6 +412,7 @@ stages:
 
           - Problem: {{design_problem}}
           - System map: {{system_map}}
+          - System classification: {{system_classification}}
           - Constraints and assumptions: {{constraints_analysis}}
           - Candidate designs explored: {{candidate_designs}}
           - Tradeoff evaluation: {{tradeoff_evaluation}}
@@ -348,6 +428,10 @@ stages:
 
           ## Problem Statement
           (Goals, constraints, actors, interfaces -- from system map)
+
+          ## System Classification
+          (System types identified with evidence, design philosophies,
+          domain patterns that informed the design)
 
           ## Constraints and Assumptions
           (Hard constraints, assumptions with impact analysis, open questions)
@@ -383,6 +467,7 @@ stages:
 #
 # After full execution, you'll have:
 # - system_map: Problem framing with goals, constraints, actors, boundaries
+# - system_classification: System types, design philosophies, domain implications
 # - constraints_analysis: Hard constraints, assumptions, open questions
 # - candidate_designs: 3 parallel architectures (simplest, scalable, robust)
 # - tradeoff_evaluation: 8-dimension comparison with recommendation

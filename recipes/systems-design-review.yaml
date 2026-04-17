@@ -1,17 +1,18 @@
 name: "systems-design-review"
-description: "Multi-stage architecture review with approval gates between reconnaissance, analysis, and report phases"
-version: "1.0.0"
+description: "Multi-stage architecture review with approval gates between reconnaissance, classification, analysis, and report phases"
+version: "1.1.0"
 author: "System Design Intelligence"
 tags: ["architecture", "review", "system-design", "staged", "approval-gates"]
 
 # Staged architecture review with approval gates.
 #
-# Three stages with human checkpoints:
+# Four stages with human checkpoints:
 # 1. Reconnaissance: Survey codebase, identify boundaries (no approval)
-# 2. Multi-Perspective Analysis: Parallel analysis from 5 perspectives, synthesize risks (approval required)
-# 3. Report: Produce the final architecture review document (approval required)
+# 2. Classification: Classify system types and load domain skills (approval required)
+# 3. Multi-Perspective Analysis: Parallel analysis from 5 perspectives, synthesize risks (approval required)
+# 4. Report: Produce the final architecture review document (approval required)
 #
-# Typical runtime: 10-20 minutes (includes approval wait times)
+# Typical runtime: 15-25 minutes (includes approval wait times)
 # Required agents: foundation:explorer, systems-design:systems-architect,
 #                  systems-design:systems-design-critic, systems-design:systems-design-writer
 #
@@ -77,21 +78,79 @@ stages:
         output: "system_map"
         timeout: 600
 
-  # Stage 2: Multi-Perspective Analysis (approval required before proceeding)
-  - name: "analysis"
+      - id: "classify-system"
+        agent: "systems-design:systems-architect"
+        prompt: |
+          Based on the codebase survey and system map, classify this system.
+
+          Codebase survey: {{codebase_survey}}
+          System map: {{system_map}}
+          Target: {{target_path}}
+
+          Produce a system classification by answering these questions:
+
+          **System types** -- which of these apply? List ALL that match, not just the primary one.
+          For each that applies, explain briefly WHY it applies (cite specific evidence from the survey):
+
+          - Web service / API (HTTP endpoints, REST/GraphQL, request-response)
+          - Event-driven (message queues, event logs, pub/sub, hooks, reactive patterns)
+          - Data pipeline (batch/streaming processing, ETL, DAG scheduling)
+          - Workflow orchestration (multi-step processes, sagas, durable execution)
+          - CLI tool (command-line interface, subcommands, plugin architecture)
+          - Real-time (WebSockets, persistent connections, state sync)
+          - Multi-tenant SaaS (tenant isolation, shared infrastructure, billing)
+          - ML serving (model serving, feature stores, inference pipelines)
+          - Distributed system (consensus, replication, partitioning, multi-node coordination)
+          - Enterprise integration (legacy modernization, API gateways, data integration)
+          - Edge / offline-first (offline operation, sync protocols, constrained resources)
+          - Single-page app (client-side routing, state management, rendering strategies)
+          - Peer-to-peer (P2P topologies, NAT traversal, decentralized coordination)
+          - Azure-hosted (Azure compute, identity, networking, managed services)
+
+          **Design philosophies** -- which does the system claim or embody?
+
+          - Linux/Unix (mechanism vs policy, composability, small sharp tools)
+          - Domain-driven (bounded contexts, ubiquitous language, aggregates)
+          - Object-oriented (SOLID, composition over inheritance, protocols/traits)
+
+          **Output format:**
+
+          SYSTEM TYPES:
+          - [type]: [evidence from survey/map]
+          - [type]: [evidence from survey/map]
+
+          DESIGN PHILOSOPHIES:
+          - [philosophy]: [evidence from survey/map]
+
+          DOMAIN SKILLS TO LOAD:
+          - system-type-[x]
+          - system-type-[y]
+          - design-philosophy-[z]
+
+          Be thorough. Most real systems match 2-4 types. A system classified as only one type
+          is likely under-classified.
+        output: "system_classification"
+        timeout: 600
+
+  # Stage 2: Classification Review (approval required before deep analysis)
+  - name: "classification"
     approval:
       required: true
       prompt: |
-        RECONNAISSANCE COMPLETE
+        RECONNAISSANCE & CLASSIFICATION COMPLETE
 
-        Codebase survey and system map are ready for review.
-
-        Survey: {{codebase_survey}}
+        Codebase survey: {{codebase_survey}}
 
         System map: {{system_map}}
 
+        System classification: {{system_classification}}
+
+        Review the system classification above. The classification determines which
+        domain-specific patterns, failure modes, and anti-patterns will be applied
+        during analysis. Getting this right matters.
+
         Approve to proceed with multi-perspective analysis (5 perspectives analyzed in parallel).
-        Deny to stop and review the reconnaissance findings manually.
+        Deny to stop and adjust the classification manually.
     steps:
       - id: "perspective-analysis"
         agent: "systems-design:systems-architect"
@@ -100,15 +159,28 @@ stages:
 
           System map: {{system_map}}
           Codebase survey: {{codebase_survey}}
+          System classification: {{system_classification}}
           Target: {{target_path}}
+
+          **Use the system classification to focus your analysis.** Apply domain-specific
+          patterns and failure modes from the classified system types. For example:
+          - If classified as event-driven: evaluate event ordering, delivery guarantees, backpressure
+          - If classified as CLI tool: evaluate plugin architecture, config layering, error UX
+          - If classified as distributed: evaluate consistency model, partition tolerance, failure detection
 
           Focus specifically on {{perspective}} concerns:
 
-          For design-integrity: Are boundaries clean? Do abstractions leak? Is coupling appropriate? Do patterns stay consistent?
-          For failure-modes: What breaks? What is the blast radius? Are there single points of failure? How does the system degrade?
+          For design-integrity: Are boundaries clean? Do abstractions leak? Is coupling appropriate? Do patterns stay consistent? Do the patterns match the claimed design philosophy?
+          For failure-modes: What breaks? What is the blast radius? Are there single points of failure? How does the system degrade? Apply failure modes specific to the classified system types.
           For scalability: What grows with usage? Where are the bottlenecks at 10x? What becomes painful first?
           For developer-experience: How hard is it to understand, modify, test, and deploy? Where do developers struggle?
           For simplicity: What is unnecessarily complex? What could be removed? Where is YAGNI violated?
+
+          **Stay at the architectural level.** Findings about boundaries, data flow, failure modes,
+          coupling, scalability, and consistency models belong here. Findings about code quality,
+          naming, type safety, or specific function implementations are out of scope -- flag them
+          briefly in a separate "Implementation Notes" section if they have architectural implications,
+          but do not let them dominate.
 
           Provide:
           1. Current state assessment (1-5 rating with justification)
@@ -130,6 +202,7 @@ stages:
 
           For the system at: {{target_path}}
           System map: {{system_map}}
+          System classification: {{system_classification}}
 
           Produce:
           1. **Cross-cutting risks**: Issues that appear across multiple perspectives
@@ -137,6 +210,13 @@ stages:
           3. **Conflicting recommendations**: Where perspectives disagree and why
           4. **Blind spots**: What wasn't covered or needs deeper investigation
           5. **Top 3 actions**: The highest-impact improvements regardless of perspective
+
+          **Categorize each finding** as either:
+          - **Architectural** (boundaries, data flow, failure modes, coupling, scalability, consistency)
+          - **Implementation** (code quality, API ergonomics, type safety, naming)
+
+          If more than 30% of findings are implementation-level, note this explicitly. A systems-design
+          review that drifts into implementation review is not serving its purpose.
 
           Be adversarial. Challenge optimistic assessments. Flag risks the individual perspectives may have underweighted.
         output: "risk_assessment"
@@ -166,6 +246,7 @@ stages:
           Use ALL of the following as source material:
           - Codebase survey: {{codebase_survey}}
           - System map: {{system_map}}
+          - System classification: {{system_classification}}
           - Multi-perspective analyses: {{perspective_analyses}}
           - Unified risk assessment: {{risk_assessment}}
 
@@ -179,6 +260,9 @@ stages:
           ## System Overview
           (System map, boundaries, major components, technology choices)
 
+          ## System Classification
+          (System types identified with evidence, design philosophies, domain patterns applied)
+
           ## Perspective Analyses
           ### Design Integrity
           ### Failure Modes
@@ -187,7 +271,8 @@ stages:
           ### Simplicity
 
           ## Risk Assessment
-          (Severity-ranked risk table with cross-cutting concerns)
+          (Severity-ranked risk table with cross-cutting concerns.
+          Clearly label each finding as Architectural or Implementation.)
 
           ## Recommendations
           (Ordered by impact, with effort estimates and dependencies)
@@ -205,6 +290,7 @@ stages:
 # After full execution, you'll have:
 # - codebase_survey: Directory structure and key file inventory
 # - system_map: Identified boundaries, components, dependencies, data flows
+# - system_classification: System types, design philosophies, domain skills to apply
 # - perspective_analyses: 5 parallel analyses (design-integrity, failure-modes, scalability, DX, simplicity)
 # - risk_assessment: Unified severity-ranked risk assessment with cross-cutting concerns
 # - final_report: Complete architecture review document written to output_path
